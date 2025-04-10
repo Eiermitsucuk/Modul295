@@ -33,18 +33,15 @@ public class ProductControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // Use @WithMockUser to simulate an ADMIN user so that authentication passes
     @Test
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     public void testCreateProductValidation() throws Exception {
         Product product = new Product();
-        // Intentionally omit the name to trigger a validation error
         product.setDescription("Test product without a name");
         product.setPrice(10.0);
 
         String json = objectMapper.writeValueAsString(product);
 
-        // Expect 400 Bad Request due to validation error
         mockMvc.perform(post("/api/admin/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
