@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gymprodukteapp      # Replace with your DB name
+    username: postgres                    # Replace with your DB username
+    password: 12345                    # Replace with your DB password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Replace with your Keycloak JWKS URI
+          jwk-set-uri: http://localhost:8080/realms/GymApp/protocol/openid-connect/certs
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
