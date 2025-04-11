@@ -34,7 +34,7 @@ public class ProductControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "admin", roles = {"admin"})
     public void testCreateProductValidation() throws Exception {
         Product product = new Product();
         product.setDescription("Test product without a name");

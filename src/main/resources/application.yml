@@ -18,11 +18,12 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # Replace with your Keycloak JWKS URI
-          jwk-set-uri: http://localhost:8080/realms/GymApp/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8080/realms/ILV
 
 springdoc:
   api-docs:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+app:
+    name: gymprodukteapp

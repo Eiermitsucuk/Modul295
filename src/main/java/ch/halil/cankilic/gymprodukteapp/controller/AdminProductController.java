@@ -1,11 +1,13 @@
 package ch.halil.cankilic.gymprodukteapp.controller;
 
 import ch.halil.cankilic.gymprodukteapp.entity.Product;
+import ch.halil.cankilic.gymprodukteapp.security.Roles;
 import ch.halil.cankilic.gymprodukteapp.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.annotation.security.RolesAllowed;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
@@ -13,6 +15,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/admin/products")
 @Tag(name = "Admin Products", description = "Endpoints for managing products (Admin only)")
+@SecurityRequirement(name = "bearerAuth") // Global security requirement for the controller
 public class AdminProductController {
 
     private final ProductService productService;
@@ -21,9 +24,9 @@ public class AdminProductController {
         this.productService = productService;
     }
 
-    @Operation(summary = "Create a new product (Admin only)")
+    @Operation(summary = "Create a new product (Admin only)", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @RolesAllowed(Roles.Admin)
     public ResponseEntity<?> createProduct(@Valid @RequestBody Product product,
                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -32,9 +35,9 @@ public class AdminProductController {
         return ResponseEntity.ok(productService.createProduct(product));
     }
 
-    @Operation(summary = "Update an existing product (Admin only)")
+    @Operation(summary = "Update an existing product (Admin only)", security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @RolesAllowed(Roles.Admin)
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
                                            @Valid @RequestBody Product product,
                                            BindingResult bindingResult) {
@@ -48,9 +51,9 @@ public class AdminProductController {
         }
     }
 
-    @Operation(summary = "Delete a product (Admin only)")
+    @Operation(summary = "Delete a product (Admin only)", security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @RolesAllowed(Roles.Admin)
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
