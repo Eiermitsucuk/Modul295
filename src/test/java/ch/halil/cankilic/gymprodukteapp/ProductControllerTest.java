@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -37,7 +37,7 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"admin"})
     public void testCreateProductValidation() throws Exception {
-        // Test case: Missing name field
+        // Fall 1: Fehlender Produktname
         Product invalidProduct = new Product();
         invalidProduct.setDescription("Test product without a name");
         invalidProduct.setPrice(10.0);
@@ -45,17 +45,19 @@ public class ProductControllerTest {
         String jsonInvalid = objectMapper.writeValueAsString(invalidProduct);
 
         mockMvc.perform(post("/api/admin/products")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonInvalid))
                 .andExpect(status().isBadRequest());
 
-        // Test case: Negative price
+        // Fall 2: Preis kleiner oder gleich 0
         invalidProduct.setName("Invalid Product");
         invalidProduct.setPrice(-5.0);
 
         String jsonNegativePrice = objectMapper.writeValueAsString(invalidProduct);
 
         mockMvc.perform(post("/api/admin/products")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonNegativePrice))
                 .andExpect(status().isBadRequest());
@@ -64,7 +66,7 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"admin"})
     public void testCreateValidProduct() throws Exception {
-        // Test case: Valid product
+        // Erstelle ein gültiges Produkt
         Product validProduct = new Product();
         validProduct.setName("Valid Product");
         validProduct.setDescription("This is a valid product");
@@ -73,6 +75,7 @@ public class ProductControllerTest {
         String jsonValid = objectMapper.writeValueAsString(validProduct);
 
         mockMvc.perform(post("/api/admin/products")
+                        .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonValid))
                 .andExpect(status().isCreated());
