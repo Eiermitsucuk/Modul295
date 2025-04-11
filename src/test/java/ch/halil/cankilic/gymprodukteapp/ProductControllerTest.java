@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,15 +37,44 @@ public class ProductControllerTest {
     @Test
     @WithMockUser(username = "admin", roles = {"admin"})
     public void testCreateProductValidation() throws Exception {
-        Product product = new Product();
-        product.setDescription("Test product without a name");
-        product.setPrice(10.0);
+        // Test case: Missing name field
+        Product invalidProduct = new Product();
+        invalidProduct.setDescription("Test product without a name");
+        invalidProduct.setPrice(10.0);
 
-        String json = objectMapper.writeValueAsString(product);
+        String jsonInvalid = objectMapper.writeValueAsString(invalidProduct);
 
         mockMvc.perform(post("/api/admin/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
+                        .content(jsonInvalid))
                 .andExpect(status().isBadRequest());
+
+        // Test case: Negative price
+        invalidProduct.setName("Invalid Product");
+        invalidProduct.setPrice(-5.0);
+
+        String jsonNegativePrice = objectMapper.writeValueAsString(invalidProduct);
+
+        mockMvc.perform(post("/api/admin/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonNegativePrice))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"admin"})
+    public void testCreateValidProduct() throws Exception {
+        // Test case: Valid product
+        Product validProduct = new Product();
+        validProduct.setName("Valid Product");
+        validProduct.setDescription("This is a valid product");
+        validProduct.setPrice(15.0);
+
+        String jsonValid = objectMapper.writeValueAsString(validProduct);
+
+        mockMvc.perform(post("/api/admin/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonValid))
+                .andExpect(status().isCreated());
     }
 }
